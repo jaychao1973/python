@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Mon Jan 15 22:55:12 2018
 
 @author: justinwu
 """
 
 from tkinter import *
+import pygame as pyg
 
 class MyGameObject(object):
     def __init__(self, mycanvas, item):
@@ -111,6 +113,9 @@ class MyGame(Frame):
         master = Tk()
         master.title('乒乓球!')
         super(MyGame, self).__init__(master)
+        pyg.mixer.init()
+        pyg.mixer.music.load('By_the_Pool.mp3')
+        pyg.mixer.music.set_volume(0.28)
         self.lives = 5
         self.width = 650
         self.height = 580
@@ -132,6 +137,8 @@ class MyGame(Frame):
         self.canvas.focus_set()
         self.canvas.bind('<Left>',lambda _: self.paddle.move(-30))
         self.canvas.bind('<Right>',lambda _: self.paddle.move(30))
+
+        
 
     def setupGame(self):
            self.addBall()
@@ -158,7 +165,7 @@ class MyGame(Frame):
         return self.canvas.create_text(x, y, text=text,
                                        font=font)
 
-    def ball_update_lives_text(self):
+    def ball_update_lives_text(self): 
         text = '乒乓球: %s' % self.lives
         if self.hud is None:
             self.hud = self.draw_text(325, 20, text, 25)
@@ -169,6 +176,7 @@ class MyGame(Frame):
         self.canvas.unbind('<space>')
         self.canvas.delete(self.text)
         self.paddle.ball = None
+        pyg.mixer.music.play()
         self.game_loop()
 
     def game_loop(self):
@@ -177,11 +185,13 @@ class MyGame(Frame):
         if num_bricks == 0: 
             self.ball.speed = None
             self.draw_text(300, 200, '你贏囉!')
+            pyg.mixer.music.stop()
         elif self.ball.position()[3] >= self.height: 
             self.ball.speed = None
             self.lives -= 1
             if self.lives < 0:
                 self.draw_text(300, 200, '遊戲結束囉')
+                pyg.mixer.music.stop()
             else:
                 self.after(1000, self.setupGame)
         else:
